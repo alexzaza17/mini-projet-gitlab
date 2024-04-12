@@ -7,7 +7,6 @@ RUN apt-get update && \
 # Remove default NGINX HTML files
 RUN rm -rf /usr/share/nginx/html/* 
 # Clone static website example from GitHub
-RUN git clone https://github.com/diranetafen/static-website-example.git /usrr
-    /share/nginx/html
+RUN git clone https://github.com/diranetafen/static-website-example.git /usr/share/nginx/html
 # Set the default entry point for the container
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
