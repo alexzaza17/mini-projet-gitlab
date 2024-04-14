@@ -32,7 +32,7 @@ test acceptation:
     
 
 
-release image:
+release image: 
   stage: Release image
   script:
     - docker load < mini-projet.tar
