@@ -8,7 +8,8 @@ stages:          # List of stages for jobs, and their order of execution
   - build
   - test acceptation
   - Release image
-  - deploy
+  - Deploy staging
+  - Deploy prod
 
 docker-build:
   # Use the official docker image.
@@ -41,3 +42,33 @@ release image:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+deploy staging:
+  stage: Deploy staging
+  environment:
+    name: staging
+    url: https://eazytraining-staging-9839de32fe85.herokuapp.com # eg: url_a_recuperer_sur_heroku
+  only:
+    - master
+  script:    
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - heroku create alexzaza1-staging || echo "project already exist"
+    - heroku container:push -a alexzaza1-staging web
+    - heroku container:release -a alexzaza1-staging web 
+
+deploy prod:
+  stage: Deploy prod
+  environment:
+    name: prod
+    url: https://alexzaza1-production-70584e6ff38a.herokuapp.com  # eg: url_a_recuperer_sur_heroku
+  only:
+    - master
+  script:    
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - heroku create alexzaza1-production || echo "project already exist"
+    - heroku container:push -a alexzaza1-production web
+    - heroku container:release -a alexzaza1-production web 
