@@ -8,8 +8,21 @@ stages:          # List of stages for jobs, and their order of execution
   - build
   - test acceptation
   - Release image
+  - Deploy review
+  - Stop review
   - Deploy staging
+  - Test staging
   - Deploy prod
+  - Test prod
+
+.test_template: &test
+  image: alpine
+  only:
+    - master
+  script:
+    - apk --no-cache add curl
+    - curl "http://$DOMAIN" 
+ 
 
 docker-build:
   # Use the official docker image.
@@ -70,3 +83,49 @@ deploy prod:
     - heroku create alexzaza1-production || echo "project already exist"
     - heroku container:push -a alexzaza1-production web
     - heroku container:release -a alexzaza1-production web 
+
+deploy review:
+  stage: Deploy review
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://alexzaza1-$CI_COMMIT_REF_NAME.herokuapp.com 
+    on_stop: stop review
+  only:
+    - merge_requests
+  script:    
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - heroku create alexzaza1-$CI_COMMIT_REF_NAME || echo "project already exist"
+    - heroku container:push -a alexzaza1-$CI_COMMIT_REF_NAME web
+    - heroku container:release -a alexzaza1-$CI_COMMIT_REF_NAME web 
+
+stop review:
+  stage: Stop review
+  variables:
+    GIT_STRATEGY: none
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  only:
+    - merge_requests
+  when: manual
+  script:    
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - heroku apps:destroy -a alexzaza1-$CI_COMMIT_REF_NAME --confirm=alexzaza1-$CI_COMMIT_REF_NAME
+
+
+test staging:
+  <<: *test 
+  stage: Test staging
+  variables:
+    DOMAIN: alexzaza1-staging-9839de32fe85.herokuapp.com
+  
+
+test prod:  
+  <<: *test  
+  stage: Test prod
+  variables:
+    DOMAIN: alexzaza1-production-70584e6ff38a.herokuapp.com
