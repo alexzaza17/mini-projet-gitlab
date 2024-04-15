@@ -66,7 +66,7 @@ deploy prod:
   only:
     - master
   script:    
-    - apk --no-cache add npm
+    - apk --no-cache add npm 
     - npm install -g heroku
     - heroku container:login
     - heroku create alexzaza1-production || echo "project already exist"
