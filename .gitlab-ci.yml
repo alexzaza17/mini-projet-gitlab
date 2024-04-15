@@ -31,8 +31,6 @@ test acceptation:
     - apk --no-cache add curl
     - curl "http://docker:80"
     
-
-
 release image: 
   stage: Release image
   script:
