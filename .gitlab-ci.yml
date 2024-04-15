@@ -84,7 +84,7 @@ deploy prod:
     - heroku container:push -a alexzaza1-production web
     - heroku container:release -a alexzaza1-production web 
 
-deploy review:
+.deploy review:
   stage: Deploy review
   environment:
     name: review/$CI_COMMIT_REF_NAME
@@ -100,7 +100,7 @@ deploy review:
     - heroku container:push -a alexzaza1-$CI_COMMIT_REF_NAME web
     - heroku container:release -a alexzaza1-$CI_COMMIT_REF_NAME web 
 
-stop review:
+.stop review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
