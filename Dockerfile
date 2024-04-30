@@ -1,5 +1,5 @@
 # Use the official NGINX image as the base image
-FROM nginx 
+FROM nginx:latest
 # Update package lists and install git
 RUN apt-get update && \
       apt-get install -y git && \
